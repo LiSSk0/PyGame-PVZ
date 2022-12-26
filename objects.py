@@ -47,16 +47,15 @@ class Board:
 
     def get_cell(self, mouse_pos):
         x, y = mouse_pos[0] - self.left, mouse_pos[1] - self.top
-        if (x < 0) or (x > self.width * self.cell_size) or\
-                (y < 0) or (y > self.height * self.cell_size):
+        if (x < 0) or (x > self.width * self.cell_size) or (y < 0) or (y > self.height * self.cell_size):
             return None
         else:
-            return x // self.cell_size, y // self.cell_size
+            return int(x) // self.cell_size, y // self.cell_size
 
-    def get_click(self, mouse_pos):
-        cell_coords = self.get_cell(mouse_pos)
-        if cell_coords is not None:
-            self.on_click(cell_coords)
-
-    def on_click(self, cell_coords):
-        pass
+    # def get_motion(self, mouse_pos):
+    #     cell_coords = self.get_cell(mouse_pos)
+    #     if cell_coords is not None:
+    #         self.on_click(cell_coords)
+    #
+    # def on_click(self, cell_coords):
+    #     return cell_coords
