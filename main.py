@@ -30,9 +30,6 @@ def RegLizzaLoh(screen):
     text = font.render("Username:", True, '#33FF00')
     screen.blit(text, (22, 22))
 
-def DrawGlazik(screen):
-    pygame.draw.circle(screen, 'red', (355,155), r)
-
 
 def WriteText(screen, name, color):
     x, y = 25, 55
@@ -52,7 +49,6 @@ if __name__ == '__main__':
     userName = ''
     dx = -1
     x = 50
-    r = 2
     im = load_image('KrInGeZaStAvKaNoEyEs.png')
     imb = load_image('KrInGeBaCkG.jfif')
     iml = load_image('KrInGeChIcKL.png')
@@ -100,6 +96,5 @@ if __name__ == '__main__':
         draw(screen, color)
         RegLizzaLoh(screen)
         WriteText(screen, userName, color)
-        DrawGlazik(screen, r)
         pygame.display.flip()
     pygame.quit()
