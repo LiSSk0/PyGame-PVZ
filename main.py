@@ -1,44 +1,37 @@
 import pygame
-from objects import Board
+from objects import Board, ZombieSprite
+from functions import decorations
 
 
 SIZE = WIDTH, HEIGHT = 1100, 600
 # SIZE = WIDTH, HEIGHT = 550, 300
 BACK_COLOR = 'darkgreen'
+LEVEL_BG = pygame.image.load('textures/wallpaperlevel.png')
 COLORS = {0: (0, 0, 0), 1: (255, 0, 0), 2: (0, 0, 255)}
-FPS = 40
+FPS = 30
 
 pygame.init()
 screen = pygame.display.set_mode(SIZE)
 
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
-
-
-def decorations():
-    bush = pygame.image.load('textures/bush.png')
-
-    rect_in = bush.get_rect()
-    new_x = rect_in.width // 8
-    new_y = rect_in.height // 8
-    bush = pygame.transform.scale(bush, (new_x, new_y))
-
-    bushes_count = 10
-    step = HEIGHT // bushes_count
-
-    for i in range(bushes_count - 2):
-        screen.blit(bush, [WIDTH - WIDTH // 10, step * i])
+zombies_group = pygame.sprite.Group()
 
 
 def main():
     screen.fill(BACK_COLOR)
+    screen.blit(LEVEL_BG, [0, 0])
 
     board = Board(9, 5)
-    board_left, board_top, cell_size = WIDTH // 4.5, HEIGHT // 7, WIDTH // 13
+    board_left, board_top, cell_size = WIDTH // 4.45, HEIGHT // 5, WIDTH // 13
     board.set_view(board_left, board_top, cell_size)
     dark_cell = pygame.Surface((cell_size - 1, cell_size - 1))
     dark_cell.fill((0, 0, 0))
     dark_cell.set_alpha(75)
+
+    zombie1 = ZombieSprite(pygame.image.load("textures/zombie1_walk4.png"), 6, 1, 800, 50, zombies_group)
+    zombie2 = ZombieSprite(pygame.image.load("textures/zombie1_walk4.png"), 6, 1, 800, 150, zombies_group)
+    zombie3 = ZombieSprite(pygame.image.load("textures/zombie1_walk4.png"), 6, 1, 800, 250, zombies_group)
 
     clock = pygame.time.Clock()
 
@@ -59,12 +52,16 @@ def main():
                     is_motion_on_cell = False
 
         screen.fill(BACK_COLOR)
+        screen.blit(LEVEL_BG, [0, 0])
 
         board.render(screen)
         if is_motion_on_cell:
             screen.blit(dark_cell, (board_left + cell_coord[0] * cell_size, board_top + cell_coord[1] * cell_size))
 
-        decorations()
+        decorations(screen, WIDTH, HEIGHT)
+
+        zombies_group.update()
+        zombies_group.draw(screen)
 
         clock.tick(FPS)
         pygame.display.flip()
