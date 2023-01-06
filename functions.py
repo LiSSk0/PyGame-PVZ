@@ -2,7 +2,7 @@ import pygame
 import os
 import sys
 from random import randint
-from objects import ZombieSprite
+from objects import *
 
 
 def decorations(screen, width, height):
@@ -40,10 +40,33 @@ def generate_zombie_coords(board_top, cell_size, width, count):
     return sorted(coords)
 
 
-def create_zombie_column(count, board_top, board_left, cell_size, width, sheet, sheet_xy, group):
-    coords = generate_zombie_coords(board_top, cell_size, width, count)
+def create_zombie_column(count, type, board_pos, cell_size, width, sheet, sheet_xy, group):
+    coords = generate_zombie_coords(board_pos[1], cell_size, width, count)
     for i in range(count):
-        zombie = ZombieSprite(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_left, group)
+        if type == 'default':
+            zombie = ZombieDefault(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+        elif type == 'grass':
+            zombie = Zombie1(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+        else:
+            print(f"WRONG PARAM {type}: at func create_zombie_column")
+        print(zombie.hp)
+
+
+def load_zombie_pic(type):
+    if type == 'default':
+        zombie = pygame.image.load('textures/zombiedefault_walk5.png')
+        rect_in = zombie.get_rect()
+        new_x, new_y = rect_in.width // 1.5, rect_in.height // 1.7
+        zombie = pygame.transform.scale(zombie, (new_x, new_y))
+    elif type == 'grass':
+        zombie = pygame.image.load('textures/zombie1_walk7.png')
+        rect_in = zombie.get_rect()
+        new_x, new_y = rect_in.width // 1.5, rect_in.height // 1.5
+        zombie = pygame.transform.scale(zombie, (new_x, new_y))
+    else:
+        print(f"WRONG PARAM {type}: at func load_zombie_pic")
+        return None
+    return zombie
 
 
 def load_image(name, colorkey=None):

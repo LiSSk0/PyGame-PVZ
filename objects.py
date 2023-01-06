@@ -61,7 +61,7 @@ class Board:
     #     return cell_coords
 
 
-class ZombieSprite(pygame.sprite.Sprite):
+class ZombieDefault(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, pos, board_left, *group):
         super().__init__(*group)
         self.frames = []
@@ -70,8 +70,9 @@ class ZombieSprite(pygame.sprite.Sprite):
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(pos[0], pos[1])
         self.border = board_left
-
         self.counter = 0
+
+        self.hp = 50
         self.velocity = 3
 
     def cut_sheet(self, sheet, columns, rows):
@@ -91,3 +92,10 @@ class ZombieSprite(pygame.sprite.Sprite):
                 self.counter //= 10
                 self.rect.x -= self.velocity
             self.counter += 1
+
+
+class Zombie1(ZombieDefault):
+    def __init__(self, sheet, columns, rows, pos, board_left, *group):
+        super().__init__(sheet, columns, rows, pos, board_left, *group)
+
+        self.hp = 100

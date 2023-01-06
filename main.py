@@ -1,6 +1,6 @@
 import pygame
 from objects import Board
-from functions import decorations, generate_zombie_coords, create_zombie_column
+from functions import *
 
 
 SIZE = WIDTH, HEIGHT = 1100, 600
@@ -29,16 +29,15 @@ def main():
     dark_cell.fill((0, 0, 0))
     dark_cell.set_alpha(75)
 
-    zombie = pygame.image.load('textures/zombie1_walk7.png')
-    rect_in = zombie.get_rect()
-    new_x = rect_in.width // 1.5
-    new_y = rect_in.height // 1.5
-    zombie = pygame.transform.scale(zombie, (new_x, new_y))
+    # zombie = pygame.image.load('textures/zombiedefault_walk5.png')
+    # rect_in = zombie.get_rect()
+    # new_x = rect_in.width // 1.5
+    # new_y = rect_in.height // 1.5
+    # zombie = pygame.transform.scale(zombie, (new_x, new_y))
 
     # zombie1 = ZombieSprite(zombie, 6, 1, coords[0], board_left, zombies_group)
     # zombie2 = ZombieSprite(zombie, 6, 1, coords[1], board_left, zombies_group)
     # zombie3 = ZombieSprite(zombie, 6, 1, coords[2], board_left, zombies_group)
-    create_zombie_column(2, board_top, board_left, cell_size, WIDTH, zombie, (6, 1), zombies_group)
 
     clock = pygame.time.Clock()
 
@@ -50,7 +49,12 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                print(board.get_cell(event.pos))
+                # types: default, grass
+                create_zombie_column(2, 'default', (board_left, board_top), cell_size, WIDTH,
+                                     load_zombie_pic('default'), (6, 1), zombies_group)
+                create_zombie_column(1, 'grass', (board_left, board_top), cell_size, WIDTH,
+                                     load_zombie_pic('grass'), (6, 1), zombies_group)
+                # print(board.get_cell(event.pos))
             if event.type == pygame.MOUSEMOTION:
                 cell_coord = board.get_cell(event.pos)
                 if cell_coord is not None:
@@ -68,7 +72,7 @@ def main():
         zombies_group.update()
         zombies_group.draw(screen)
 
-        decorations(screen, WIDTH, HEIGHT)
+        # decorations(screen, WIDTH, HEIGHT)
 
         clock.tick(FPS)
         pygame.display.flip()
