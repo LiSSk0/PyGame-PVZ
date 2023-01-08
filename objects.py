@@ -99,3 +99,10 @@ class Zombie1(ZombieDefault):
         super().__init__(sheet, columns, rows, pos, board_left, *group)
 
         self.hp = 100
+
+
+class ZombieWoman(ZombieDefault):
+    def __init__(self, sheet, columns, rows, pos, board_left, *group):
+        super().__init__(sheet, columns, rows, pos, board_left, *group)
+
+        self.hp = 75

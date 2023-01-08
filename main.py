@@ -36,12 +36,11 @@ def main():
     # zombie = pygame.transform.scale(zombie, (new_x, new_y))
 
     # zombie1 = ZombieSprite(zombie, 6, 1, coords[0], board_left, zombies_group)
-    # zombie2 = ZombieSprite(zombie, 6, 1, coords[1], board_left, zombies_group)
-    # zombie3 = ZombieSprite(zombie, 6, 1, coords[2], board_left, zombies_group)
 
     clock = pygame.time.Clock()
 
     is_motion_on_cell = False
+    sun_counter = 0
 
     running = True
     while running:
@@ -49,11 +48,13 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # types: default, grass
-                create_zombie_column(2, 'default', (board_left, board_top), cell_size, WIDTH,
+                # types: default, grass, woman
+                create_zombie_column(1, 'default', (board_left, board_top), cell_size, WIDTH,
                                      load_zombie_pic('default'), (6, 1), zombies_group)
                 create_zombie_column(1, 'grass', (board_left, board_top), cell_size, WIDTH,
                                      load_zombie_pic('grass'), (6, 1), zombies_group)
+                create_zombie_column(1, 'woman', (board_left, board_top), cell_size, WIDTH,
+                                     load_zombie_pic('woman'), (6, 1), zombies_group)
                 # print(board.get_cell(event.pos))
             if event.type == pygame.MOUSEMOTION:
                 cell_coord = board.get_cell(event.pos)
@@ -72,7 +73,10 @@ def main():
         zombies_group.update()
         zombies_group.draw(screen)
 
-        # decorations(screen, WIDTH, HEIGHT)
+        decorations(screen, WIDTH, HEIGHT)
+        set_sun_counter(screen, int(sun_counter))
+        if sun_counter < 9999:
+            sun_counter += 0.1
 
         clock.tick(FPS)
         pygame.display.flip()
