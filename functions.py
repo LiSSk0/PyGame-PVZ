@@ -3,6 +3,8 @@ import os
 import sys
 from random import randint
 from objects import *
+import sqlite3
+
 
 
 def decorations(screen, width, height):
@@ -86,7 +88,7 @@ def create_zombie_column(count, type, board_pos, cell_size, width, sheet, sheet_
 def create_plant(pos, tops, cell_size, all_player_sprites):
     a = pos[0] * cell_size + tops[0]
     b = pos[1] * cell_size + tops[1]
-    player = Player(load_image("textures\shooter3.png"), 5, 1, a, b)
+    player = Player(load_image("textures\sh0.png"), 5, 1, a, b)
     all_player_sprites.add(player)
 
 
@@ -129,3 +131,60 @@ def load_image(name, colorkey=None):
         image = image.convert_alpha()
 
     return image
+
+
+def addUser(user):
+    level = 0
+    con = sqlite3.connect('PvsZ.db')
+    cur = con.cursor()
+    cur.execute("""SELECT COUNT(*) FROM achievement WHERE username = (?)""", (user,))
+    cnt = cur.fetchone()[0]
+    if cnt == 0:
+        cur.execute(""" INSERT INTO achievement (username, level) VALUES (?, ?)""", (user, 0))
+    else:
+        cur.execute("""SELECT level FROM achievement WHERE username = (?)""", (user,))
+        level = cur.fetchone()[0]
+    con.commit()
+    cur.close()
+    return level
+
+def draw(screen, color):
+    font = pygame.font.Font(None, 35)
+    text = font.render("Plants VS Zombies", True, color)
+    text_w = text.get_width()
+    text_h = text.get_height()
+    text_x, text_y = 25, 345
+    pygame.draw.rect(screen, '#663300', (text_x - 10, text_y - 10,
+                                         text_w + 20, text_h + 20))
+    pygame.draw.rect(screen, '#00CCCC', (text_x - 10, text_y - 10,
+                                         text_w + 20, text_h + 20), 3)
+
+    screen.blit(text, (text_x, text_y))
+
+
+def Registration(screen):
+    font = pygame.font.Font(None, 27)
+    pygame.draw.rect(screen, '#663300', (20, 20, 100, 23))
+    pygame.draw.rect(screen, '#000000', (20, 20, 100, 23), 3)
+    pygame.draw.rect(screen, '#AE604D', (20, 50, 200, 30))
+    pygame.draw.rect(screen, '#000000', (20, 50, 200, 30), 3)
+    text = font.render("Username:", True, '#33FF00')
+    screen.blit(text, (22, 22))
+
+
+def WriteText(screen, name, color):
+    x, y = 25, 55
+    font = pygame.font.Font(None, 27)
+    text = font.render(name, True, color)
+    screen.blit(text, (x, y))
+
+
+def CheckWhereClicked(position):
+    if 20 < position[0] < 220 and 50 < position[1] < 80:
+        return True
+    return False
+
+def DrawWheels(screen, r1, r2):
+    pygame.draw.circle(screen, '#000000', (355, 150), r1)
+    pygame.draw.circle(screen, '#000000', (420, 140), r2)
+
