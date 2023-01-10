@@ -52,19 +52,18 @@ class Board:
     def occupied(self, pos):
         try:
             a, b = self.get_cell(pos)
-        except TypeError:
+        except Exception:
             return
         self.board[b][a][1] = 1
 
     def check_if_occupied(self, pos):
         try:
             a, b = self.get_cell(pos)
-        except TypeError:
-            return True
+        except Exception:
+            return False
         if self.board[b][a][1] == 0:
             return False
         return True
-
 
     def get_cell(self, mouse_pos):
         x, y = mouse_pos[0] - self.left, mouse_pos[1] - self.top
@@ -82,16 +81,16 @@ class Board:
     #     return cell_coords
 
 
-
-class ZombieDefault(pygame.sprite.Sprite, Board):
-    def __init__(self, sheet, columns, rows, pos, board_left, *group):
+class ZombieDefault(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, pos, board, *group):
         super().__init__(*group)
         self.frames = []
         self.cut_sheet(sheet, columns, rows)
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(pos[0], pos[1])
-        self.border = board_left
+        self.board = board
+        self.border = board.left
         self.counter = 0
 
         self.hp = 50
@@ -105,7 +104,6 @@ class ZombieDefault(pygame.sprite.Sprite, Board):
                 self.frames.append(sheet.subsurface(pygame.Rect(frame_location, self.rect.size)))
 
     def update(self):
-        # здесь можно сделать проверку на наличие цветов на линии
         if self.rect.x <= self.border:
             self.kill()
         else:
@@ -113,7 +111,8 @@ class ZombieDefault(pygame.sprite.Sprite, Board):
                 self.cur_frame = (self.cur_frame + 1) % len(self.frames)
                 self.image = self.frames[self.cur_frame]
                 self.counter //= 10
-                self.rect.x -= self.velocity
+                if not self.board.check_if_occupied((self.rect.x, self.rect.y + self.image.get_height() // 2)):
+                    self.rect.x -= self.velocity
             self.counter += 1
 
 
@@ -130,6 +129,7 @@ class ZombieWoman(ZombieDefault):
 
         self.hp = 75
 
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, x, y, *players):
         super().__init__(*players)
@@ -139,6 +139,7 @@ class Player(pygame.sprite.Sprite):
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
+
         self.hp = 50
         self.damage = 20
 
@@ -152,7 +153,7 @@ class Player(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
 
     def update(self):
-        if self.counter % 7 == 0:
+        if self.counter % 15 == 0:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
         self.counter += 1

@@ -59,15 +59,6 @@ def level_screen(screen, width, height, fps):
     dark_cell.fill((0, 0, 0))
     dark_cell.set_alpha(75)
 
-
-    # zombie = pygame.image.load('textures/zombiedefault_walk5.png')
-    # rect_in = zombie.get_rect()
-    # new_x = rect_in.width // 1.5
-    # new_y = rect_in.height // 1.5
-    # zombie = pygame.transform.scale(zombie, (new_x, new_y))
-
-    #zombie1 = ZombieSprite(zombie, 6, 1, coords[0], board_left, zombies_group)
-
     clock = pygame.time.Clock()
 
     is_motion_on_cell = False
@@ -79,20 +70,21 @@ def level_screen(screen, width, height, fps):
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
-                #sun_counter > 24
                 if not(board.check_if_occupied(event.pos)):
-                    board.occupied(event.pos)
-                    create_plant(board.get_cell(event.pos), (board_left, board_top), cell_size, all_player_sprites)
-                    #sun_counter -= 25
+                    if sun_counter >= 50:
+                        board.occupied(event.pos)
+                        create_plant(board.get_cell(event.pos), (board_left, board_top), cell_size, all_player_sprites)
+                        sun_counter -= 50
 
                 # types: default, grass, woman
-                create_zombie_column(1, 'default', (board_left, board_top), cell_size, width,
-                                     load_zombie_pic('default'), (3, 1), zombies_group)
-                create_zombie_column(1, 'grass', (board_left, board_top), cell_size, width,
-                                      load_zombie_pic('grass'), (6, 1), zombies_group)
-                create_zombie_column(1, 'woman', (board_left, board_top), cell_size, width,
-                                      load_zombie_pic('woman'), (6, 1), zombies_group)
+                create_zombie_column(1, 'default', board, cell_size, width,
+                                     load_zombie_pic('default'), (6, 1), zombies_group)
+                # create_zombie_column(1, 'grass', board, cell_size, width,
+                #                      load_zombie_pic('grass'), (6, 1), zombies_group)
+                # create_zombie_column(1, 'woman', board, cell_size, width,
+                #                      load_zombie_pic('woman'), (6, 1), zombies_group)
                 # print(board.get_cell(event.pos))
+
             if event.type == pygame.MOUSEMOTION:
                 cell_coord = board.get_cell(event.pos)
                 if cell_coord is not None:
@@ -111,10 +103,10 @@ def level_screen(screen, width, height, fps):
         all_player_sprites.update()
         all_player_sprites.draw(screen)
 
-        decorations(screen, width, height)
+        # decorations(screen, width, height)
         set_sun_counter(screen, int(sun_counter))
         if sun_counter < 9999:
-            sun_counter += 0.1
+            sun_counter += 0.5
 
         clock.tick(fps)
         pygame.display.flip()

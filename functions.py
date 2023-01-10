@@ -70,23 +70,30 @@ def generate_zombie_coords(board_top, cell_size, width, count):
     return sorted(coords)
 
 
-def create_zombie_column(count, type, board_pos, cell_size, width, sheet, sheet_xy, group):
-    coords = generate_zombie_coords(board_pos[1], cell_size, width, count)
+def create_zombie_column(count, type, board, cell_size, width, sheet, sheet_xy, group):
+    coords = generate_zombie_coords(board.top, cell_size, width, count)
     for i in range(count):
         if type == 'default':
-            zombie = ZombieDefault(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+            zombie = ZombieDefault(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         elif type == 'grass':
-            zombie = Zombie1(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+            zombie = Zombie1(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         elif type == 'woman':
-            zombie = ZombieWoman(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+            zombie = ZombieWoman(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         else:
             print(f"WRONG PARAM {type}: at func create_zombie_column")
         print(zombie.hp)
 
+
 def create_plant(pos, tops, cell_size, all_player_sprites):
     a = pos[0] * cell_size + tops[0]
     b = pos[1] * cell_size + tops[1]
-    player = Player(load_image("textures\shooter3.png"), 5, 1, a, b)
+
+    plant = pygame.image.load('textures/shooter3.png')
+    rect_in = plant.get_rect()
+    new_x, new_y = rect_in.width // 1.25, rect_in.height // 1.25
+    plant = pygame.transform.scale(plant, (new_x, new_y))
+
+    player = Player(plant, 5, 1, a, b)
     all_player_sprites.add(player)
 
 
