@@ -10,7 +10,11 @@ class Board:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.board = [[0] * width for _ in range(height)]
+        self.board = []
+        for i in range(height):
+            self.board.append([])
+            for j in range(width):
+                self.board[i].append([0, 0])
 
         self.left = 10
         self.top = 10
@@ -45,6 +49,23 @@ class Board:
                     screen.blit(grass2, (self.left + x * self.cell_size + 1, self.top + y * self.cell_size + 1))
                     swap = True
 
+    def occupied(self, pos):
+        try:
+            a, b = self.get_cell(pos)
+        except TypeError:
+            return
+        self.board[b][a][1] = 1
+
+    def check_if_occupied(self, pos):
+        try:
+            a, b = self.get_cell(pos)
+        except TypeError:
+            return True
+        if self.board[b][a][1] == 0:
+            return False
+        return True
+
+
     def get_cell(self, mouse_pos):
         x, y = mouse_pos[0] - self.left, mouse_pos[1] - self.top
         if (x < 0) or (x > self.width * self.cell_size) or (y < 0) or (y > self.height * self.cell_size):
@@ -61,7 +82,8 @@ class Board:
     #     return cell_coords
 
 
-class ZombieDefault(pygame.sprite.Sprite):
+
+class ZombieDefault(pygame.sprite.Sprite, Board):
     def __init__(self, sheet, columns, rows, pos, board_left, *group):
         super().__init__(*group)
         self.frames = []
@@ -83,6 +105,7 @@ class ZombieDefault(pygame.sprite.Sprite):
                 self.frames.append(sheet.subsurface(pygame.Rect(frame_location, self.rect.size)))
 
     def update(self):
+        # здесь можно сделать проверку на наличие цветов на линии
         if self.rect.x <= self.border:
             self.kill()
         else:
@@ -106,3 +129,30 @@ class ZombieWoman(ZombieDefault):
         super().__init__(sheet, columns, rows, pos, board_left, *group)
 
         self.hp = 75
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y, *players):
+        super().__init__(*players)
+        self.counter = 0
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+        self.hp = 50
+        self.damage = 20
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):
+        if self.counter % 7 == 0:
+            self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+            self.image = self.frames[self.cur_frame]
+        self.counter += 1
