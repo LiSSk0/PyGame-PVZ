@@ -83,6 +83,12 @@ def create_zombie_column(count, type, board_pos, cell_size, width, sheet, sheet_
             print(f"WRONG PARAM {type}: at func create_zombie_column")
         print(zombie.hp)
 
+def create_plant(pos, tops, cell_size, all_player_sprites):
+    a = pos[0] * cell_size + tops[0]
+    b = pos[1] * cell_size + tops[1]
+    player = Player(load_image("textures\shooter3.png"), 5, 1, a, b)
+    all_player_sprites.add(player)
+
 
 def load_zombie_pic(type):
     if type == 'default':
