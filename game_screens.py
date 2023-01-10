@@ -1,6 +1,10 @@
 import pygame
 from objects import Board
 from functions import *
+from random import randint
+
+
+
 
 
 def menu_screen(fps):
@@ -41,6 +45,74 @@ def menu_screen(fps):
             #         motion_on_button = 1
 
         clock.tick(fps)
+        pygame.display.flip()
+    pygame.quit()
+
+def reg_screen():
+    SIZE = W, H = 600, 600
+    FPS = 1
+    pygame.init()
+    screen = pygame.display.set_mode(SIZE)
+    pygame.display.set_caption('Plants VS Zombies')
+    running = True
+    screen.fill((0, 0, 0))
+    pygame.display.flip()
+    userName = ''
+    dx = -1
+    x = 50
+    radius1 = 10
+    radius2 = 10
+    checked = False
+    im = load_image('textures\KrInGeZaStAvKaNoEyEs.png')
+    imb = load_image('textures\KrInGeBaCkG.jfif')
+    iml = load_image('textures\KrInGeChIcKL.png')
+    imr = load_image('textures\KrInGeChIcKR.png')
+
+    imb = pygame.transform.scale(imb, (1067, 600))
+    imr = pygame.transform.scale(imr, (820 // 3, 548 // 3))
+    iml = pygame.transform.scale(iml, (820 // 3, 548 // 3))
+
+    while running:
+        screen.fill((0, 0, 255))
+        screen.blit(imb, (0, 0))
+        screen.blit(im, (0, 0))
+
+        x += dx
+
+        if x + dx > 600 - 820 // 3 or x + dx < 0:
+            dx *= -1
+        if dx == 1:
+            screen.blit(imr, (x, 430))
+        else:
+            screen.blit(iml, (x, 430))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_position = pygame.mouse.get_pos()
+                if CheckWhereClicked(mouse_position):
+                    checked = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    if userName != '':
+                        return [userName, addUser(userName)]
+                    checked = False
+                elif checked:
+                    if event.key == pygame.K_BACKSPACE:
+                        userName = userName[:-1]
+                    else:
+                        if len(userName) <= 10:
+                            userName += event.unicode
+
+        color = (randint(100, 255), randint(100, 255), randint(100, 180))
+        radius1 += (dx * 0.03)
+        radius2 -= (dx * 0.02)
+
+        draw(screen, color)
+        DrawWheels(screen, radius1, radius2)
+        Registration(screen)
+        WriteText(screen, userName, color)
         pygame.display.flip()
     pygame.quit()
 
@@ -88,10 +160,10 @@ def level_screen(screen, width, height, fps):
                 # types: default, grass, woman
                 create_zombie_column(1, 'default', (board_left, board_top), cell_size, width,
                                      load_zombie_pic('default'), (3, 1), zombies_group)
-                create_zombie_column(1, 'grass', (board_left, board_top), cell_size, width,
-                                      load_zombie_pic('grass'), (6, 1), zombies_group)
-                create_zombie_column(1, 'woman', (board_left, board_top), cell_size, width,
-                                      load_zombie_pic('woman'), (6, 1), zombies_group)
+                # create_zombie_column(1, 'grass', (board_left, board_top), cell_size, width,
+                #                       load_zombie_pic('grass'), (6, 1), zombies_group)
+                # create_zombie_column(1, 'woman', (board_left, board_top), cell_size, width,
+                #                       load_zombie_pic('woman'), (6, 1), zombies_group)
                 # print(board.get_cell(event.pos))
             if event.type == pygame.MOUSEMOTION:
                 cell_coord = board.get_cell(event.pos)
