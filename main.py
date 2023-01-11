@@ -14,8 +14,10 @@ screen = pygame.display.set_mode(SIZE)
 
 def main():
     pygame.display.set_caption('Plants vs. Zombies')
-    result = reg_screen()
+
+    result = reg_screen(600, 600)
     print('Hello,', result[0].capitalize(), 'welcome to the game!', result[1], 'level')
+
     result = menu_screen(FPS)
     if result == 1:
         level_screen(screen, WIDTH, HEIGHT, FPS)

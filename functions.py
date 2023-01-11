@@ -6,7 +6,6 @@ from objects import *
 import sqlite3
 
 
-
 def decorations(screen, width, height):
     # bushes:
     bush = pygame.image.load('textures/bush.png')
@@ -72,23 +71,30 @@ def generate_zombie_coords(board_top, cell_size, width, count):
     return sorted(coords)
 
 
-def create_zombie_column(count, type, board_pos, cell_size, width, sheet, sheet_xy, group):
-    coords = generate_zombie_coords(board_pos[1], cell_size, width, count)
+def create_zombie_column(count, type, board, cell_size, width, sheet, sheet_xy, group):
+    coords = generate_zombie_coords(board.top, cell_size, width, count)
     for i in range(count):
         if type == 'default':
-            zombie = ZombieDefault(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+            zombie = ZombieDefault(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         elif type == 'grass':
-            zombie = Zombie1(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+            zombie = Zombie1(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         elif type == 'woman':
-            zombie = ZombieWoman(sheet, sheet_xy[0], sheet_xy[1], coords[i], board_pos[0], group)
+            zombie = ZombieWoman(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         else:
             print(f"WRONG PARAM {type}: at func create_zombie_column")
         print(zombie.hp)
 
+
 def create_plant(pos, tops, cell_size, all_player_sprites):
     a = pos[0] * cell_size + tops[0]
     b = pos[1] * cell_size + tops[1]
-    player = Player(load_image("textures\sh0.png"), 5, 1, a, b)
+
+    plant = pygame.image.load('textures/shooter1.png')
+    # rect_in = plant.get_rect()
+    # new_x, new_y = rect_in.width // 1.15, rect_in.height // 1.15
+    # plant = pygame.transform.scale(plant, (new_x, new_y))
+
+    player = Player(plant, 5, 1, a, b)
     all_player_sprites.add(player)
 
 
@@ -148,6 +154,7 @@ def addUser(user):
     cur.close()
     return level
 
+
 def draw(screen, color):
     font = pygame.font.Font(None, 35)
     text = font.render("Plants VS Zombies", True, color)
@@ -184,7 +191,7 @@ def CheckWhereClicked(position):
         return True
     return False
 
+
 def DrawWheels(screen, r1, r2):
     pygame.draw.circle(screen, '#000000', (355, 150), r1)
     pygame.draw.circle(screen, '#000000', (420, 140), r2)
-
