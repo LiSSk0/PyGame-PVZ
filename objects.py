@@ -157,3 +157,10 @@ class Player(pygame.sprite.Sprite):
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
         self.counter += 1
+
+
+class Level:
+    def __init__(self, zombies):
+        self.default_cnt = zombies[0]
+        self.woman_cnt = zombies[1]
+        self.grass_cnt = zombies[2]

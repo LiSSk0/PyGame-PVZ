@@ -82,7 +82,7 @@ def create_zombie_column(count, type, board, cell_size, width, sheet, sheet_xy, 
             zombie = ZombieWoman(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         else:
             print(f"WRONG PARAM {type}: at func create_zombie_column")
-        print(zombie.hp)
+       # print(zombie.hp)
 
 
 def create_plant(pos, tops, cell_size, all_player_sprites):
@@ -140,19 +140,43 @@ def load_image(name, colorkey=None):
 
 
 def addUser(user):
-    level = 0
+    level = 1
     con = sqlite3.connect('PvsZ.db')
     cur = con.cursor()
     cur.execute("""SELECT COUNT(*) FROM achievement WHERE username = (?)""", (user,))
     cnt = cur.fetchone()[0]
     if cnt == 0:
-        cur.execute(""" INSERT INTO achievement (username, level) VALUES (?, ?)""", (user, 0))
+        cur.execute("""INSERT INTO achievement (username, level) VALUES (?, ?)""", (user, level))
     else:
         cur.execute("""SELECT level FROM achievement WHERE username = (?)""", (user,))
         level = cur.fetchone()[0]
     con.commit()
     cur.close()
     return level
+
+
+def check_level(user):
+    con = sqlite3.connect('PvsZ.db')
+    cur = con.cursor()
+    cnt = cur.execute(f'SELECT COUNT(*) FROM achievement WHERE username = "{user}"').fetchone()[0]
+    if cnt != 0:
+        level = int(cur.execute(f'select level from achievement where username = "{user}"').fetchone()[0])
+        return level
+    return None
+
+
+def increase_level(user):
+    con = sqlite3.connect('PvsZ.db')
+    cur = con.cursor()
+    cnt = cur.execute(f'SELECT COUNT(*) FROM achievement WHERE username = "{user}"').fetchone()[0]
+    if cnt != 0:
+        level = int(cur.execute(f'select level from achievement where username = "{user}"').fetchone()[0])
+        if level < 5:
+            cur.execute(f'delete from achievement where username = "{user}"')
+            con.commit()
+            cur.execute(f'INSERT INTO achievement (username, level) VALUES ("{user}", {level + 1})')
+            con.commit()
+    cur.close()
 
 
 def draw(screen, color):
