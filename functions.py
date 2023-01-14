@@ -140,7 +140,7 @@ def load_image(name, colorkey=None):
 
 
 def addUser(user):
-    level = 1
+    level = 0
     con = sqlite3.connect('PvsZ.db')
     cur = con.cursor()
     cur.execute("""SELECT COUNT(*) FROM achievement WHERE username = (?)""", (user,))
@@ -177,6 +177,16 @@ def increase_level(user):
             cur.execute(f'INSERT INTO achievement (username, level) VALUES ("{user}", {level + 1})')
             con.commit()
     cur.close()
+
+
+def top5users():
+    con = sqlite3.connect('PvsZ.db')
+    cur = con.cursor()
+    users = cur.execute('select username, level from achievement order by level desc limit 5').fetchall()
+    for i in range(5 - len(users)):
+        users.append(('', ''))
+    cur.close()
+    return users
 
 
 def draw(screen, color):
@@ -219,3 +229,30 @@ def CheckWhereClicked(position):
 def DrawWheels(screen, r1, r2):
     pygame.draw.circle(screen, '#000000', (355, 150), r1)
     pygame.draw.circle(screen, '#000000', (420, 140), r2)
+
+
+def top5Table(screen, width, height, users):
+    pygame.draw.rect(screen, (0, 0, 50), (width // 1.75, 0, width, height), 0)
+    pygame.draw.rect(screen, (0, 0, 200), (width // 1.75, 0, width, height), 10)
+
+    font_scoring = pygame.font.Font(None, 50)
+    text1 = font_scoring.render("SCORING", True, (255, 100, 0))
+    screen.blit(text1, (width // 1.75 + 170, 25))
+
+    font_title = pygame.font.Font(None, 50)
+    text1 = font_title.render("Top 5 users:", True, (0, 0, 200))
+    screen.blit(text1, (width // 1.75 + 150, 75))
+
+    y = 175
+    for user in users:
+        nickname = str(user[0])
+        if nickname != "":
+            if len(nickname) > 10:
+                nickname = nickname[:8] + "..."
+            text_nick = font_title.render("'" + nickname + "'", True, (0, 0, 200))
+            screen.blit(text_nick, (width // 1.75 + 30, y))
+
+            text_lvl = font_title.render('level ' + str(user[1]), True, (0, 0, 200))
+            screen.blit(text_lvl, (width // 1.75 + 330, y))
+
+            y += 75

@@ -19,20 +19,19 @@ def main():
     username = result[0]
     level = result[1]
     print('Hello,', username, 'welcome to the game!', level, 'level')
-    # increase_level(username)
 
     result = menu_screen(FPS, username)
     print("opening level", result)
     if result == 1:
-        level_screen(screen, WIDTH, HEIGHT, FPS, Level((10, 5, 3)))
+        level_screen(screen, WIDTH, HEIGHT, FPS, Level((10, 5, 3)), username)
     if result == 2:
-        level_screen(screen, WIDTH, HEIGHT, FPS, Level((20, 10, 5)))
+        level_screen(screen, WIDTH, HEIGHT, FPS, Level((20, 10, 5)), username)
     if result == 3:
-        level_screen(screen, WIDTH, HEIGHT, FPS, Level((25, 15, 10)))
+        level_screen(screen, WIDTH, HEIGHT, FPS, Level((25, 15, 10)), username)
     if result == 4:
-        level_screen(screen, WIDTH, HEIGHT, FPS, Level((35, 25, 15)))
+        level_screen(screen, WIDTH, HEIGHT, FPS, Level((35, 25, 15)), username)
     if result == 5:
-        level_screen(screen, WIDTH, HEIGHT, FPS, Level((40, 25, 35)))
+        level_screen(screen, WIDTH, HEIGHT, FPS, Level((40, 25, 35)), username)
 
     pygame.quit()
 

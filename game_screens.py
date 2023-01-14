@@ -22,16 +22,19 @@ def reg_screen(width, height):
     radius1, radius2 = 10, 10
     checked = False
 
-    im = pygame.image.load('textures/KrInGeZaStAvKaNoEyEs.png')
-    imb = pygame.image.load('textures/KrInGeBaCkG.jfif')
-    iml = pygame.image.load('textures/KrInGeChIcKL.png')
-    imr = pygame.image.load('textures/KrInGeChIcKR.png')
+    im = pygame.image.load('textures/reg_zombie.png')
+    imb = pygame.image.load('textures/reg_bg.jfif')
+    iml = pygame.image.load('textures/zombiebird_left.png')
+    imr = pygame.image.load('textures/zombiebird_right.png')
 
     imb = pygame.transform.scale(imb, (1067, 600))
     imr = pygame.transform.scale(imr, (820 // 3, 548 // 3))
     iml = pygame.transform.scale(iml, (820 // 3, 548 // 3))
 
     color_counter = 0
+    color = (0, 0, 0)
+    top5 = top5users()
+
     running = True
     while running:
         screen.fill((0, 0, 255))
@@ -39,7 +42,6 @@ def reg_screen(width, height):
         screen.blit(im, (0, 0))
 
         x += dx
-
         if x + dx > 600 - 820 // 3 or x + dx < 0:
             dx *= -1
         if dx == 1:
@@ -78,6 +80,7 @@ def reg_screen(width, height):
         DrawWheels(screen, radius1, radius2)
         Registration(screen)
         WriteText(screen, username, color)
+        top5Table(screen, width, height, top5)
 
         pygame.display.flip()
 
@@ -85,7 +88,7 @@ def reg_screen(width, height):
 # Экран меню выбора уровней
 def menu_screen(fps, username):
     size = width, height = 1100, 600
-    os.environ['SDL_VIDEO_CENTERED'] = '1'
+    # os.environ['SDL_VIDEO_CENTERED'] = '1'
     screen = pygame.display.set_mode(size)
 
     screen.fill('darkblue')
@@ -93,13 +96,20 @@ def menu_screen(fps, username):
     menu_bg = pygame.transform.scale(menu_bg, (width, height))
     screen.blit(menu_bg, [0, 0])
 
+    zombie_pic = pygame.image.load('textures/zombiebird_left.png')
+    zombie_pic = pygame.transform.scale(zombie_pic, (450, 300))
+    zombie_pic.set_alpha(125)
+    screen.blit(zombie_pic, (width - zombie_pic.get_width() + 50, height - zombie_pic.get_height()))
+    tree_pic = pygame.image.load('textures/creepy_tree.png')
+    tree_pic = pygame.transform.scale(tree_pic, (300, 550))
+    screen.blit(tree_pic, (25, height // 6))
+
     button = pygame.image.load('textures/button.png')
     button_size = (275, 90)
     button = pygame.transform.scale(button, button_size)
+
     font = pygame.font.Font(None, 40)
-
-    level = check_level(username)
-
+    level = check_level(username) + 1
     if level >= 1:
         text_lvl1 = font.render(str("Level 1"), True, (150, 0, 200))
         coords_lvl1 = (width // 2 - button_size[0] // 2, 0)
@@ -125,6 +135,14 @@ def menu_screen(fps, username):
         coords_lvl5 = (width // 2 - button_size[0] // 2, 500)
         screen.blit(button, [*coords_lvl5])
         screen.blit(text_lvl5, (width // 2 - text_lvl5.get_width() // 2, button_size[1] // 2.65 + 500))
+
+    nickname = str(username)
+    if len(nickname) > 9:
+        nickname = nickname[:8] + "..."
+    text_username = font.render(str("Username: '" + nickname + "'"), True, (150, 0, 200))
+    screen.blit(text_username, (10, 10))
+    text_username = font.render(str("Level: " + str(level - 1)), True, (150, 0, 200))
+    screen.blit(text_username, (10, 50))
 
     clock = pygame.time.Clock()
 
@@ -156,18 +174,12 @@ def menu_screen(fps, username):
                    coords_lvl5[1] <= y <= coords_lvl5[1] + button_size[1]:
                     return 5
 
-            # if event.type == pygame.MOUSEMOTION:
-            #     x, y = event.pos
-            #     if coords_lvl1[0] <= x <= coords_lvl1[0] + button_size[0] and \
-            #        coords_lvl1[1] <= y <= coords_lvl1[1] + button_size[1]:
-            #         motion_on_button = 1
-
         clock.tick(fps)
         pygame.display.flip()
 
 
 # Экран уровня
-def level_screen(screen, width, height, fps, level):
+def level_screen(screen, width, height, fps, level, username):
     level_bg = pygame.image.load('textures/wallpaperlevel.png')
     screen.blit(level_bg, [0, 0])
 
@@ -187,23 +199,29 @@ def level_screen(screen, width, height, fps, level):
         'grass': level.grass_cnt
     }
 
-    clock = pygame.time.Clock()
-
+    cur_level = check_level(username) + 1
     is_motion_on_cell = False
+    is_level_already_increased = False
+    end = 1
     sun_counter = 0
     counter = 0
 
+    clock = pygame.time.Clock()
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if not(board.check_if_occupied(event.pos)):
-                    if sun_counter >= 50:
-                        board.occupied(event.pos)
-                        create_plant(board.get_cell(event.pos), (board_left, board_top), cell_size, all_player_sprites)
-                        sun_counter -= 50
+                if end == -1:
+                    if not(board.check_if_occupied(event.pos)):
+                        if sun_counter >= 50:
+                            board.occupied(event.pos)
+                            create_plant(board.get_cell(event.pos), (board_left, board_top),
+                                         cell_size, all_player_sprites)
+                            sun_counter -= 50
+                else:
+                    return end
 
             if event.type == pygame.MOUSEMOTION:
                 cell_coord = board.get_cell(event.pos)
@@ -214,35 +232,57 @@ def level_screen(screen, width, height, fps, level):
 
         screen.blit(level_bg, [0, 0])
 
-        board.render(screen)
-        if is_motion_on_cell:
-            screen.blit(dark_cell, (board_left + cell_coord[0] * cell_size, board_top + cell_coord[1] * cell_size))
+        if end == -1:
+            board.render(screen)
+            if is_motion_on_cell:
+                screen.blit(dark_cell, (board_left + cell_coord[0] * cell_size, board_top + cell_coord[1] * cell_size))
 
-        zombies_group.update()
-        zombies_group.draw(screen)
-        all_player_sprites.update()
-        all_player_sprites.draw(screen)
+            zombies_group.update()
+            zombies_group.draw(screen)
+            all_player_sprites.update()
+            all_player_sprites.draw(screen)
+            decorations(screen, width, height)
 
-        types = ['default', 'woman', 'grass']
-        if counter % 500 == 0:
-            if (zombie_count['default'] + zombie_count['woman'] + zombie_count['grass']) > 0:
-                type = choice(types)
-                while zombie_count[type] == 0:
+            types = ['default', 'woman', 'grass']
+            if counter % 500 == 0:
+                if (zombie_count['default'] + zombie_count['woman'] + zombie_count['grass']) > 0:
                     type = choice(types)
-                create_zombie_column(1, type, board, cell_size, width,
-                                     load_zombie_pic(type), (6, 1), zombies_group)
-                zombie_count[type] -= 1
-            else:
-                # when zombies had ended
-                pass
-            counter //= 500
-        counter += 1
+                    while zombie_count[type] == 0:
+                        type = choice(types)
+                    create_zombie_column(1, type, board, cell_size, width,
+                                         load_zombie_pic(type), (6, 1), zombies_group)
+                    zombie_count[type] -= 1
+                else:  # when zombies have ended
+                    if zombies_group.__len__() == 0:
+                        end = 1
+                counter //= 500
+            counter += 1
 
-        decorations(screen, width, height)
+            set_sun_counter(screen, int(sun_counter))
+            if sun_counter < 9999:
+                sun_counter += 0.1
+        else:
+            if end == 1:
+                end_rect_color = (0, 200, 50)
+                end_text = f"Win! Level {cur_level} completed."
+                if not is_level_already_increased:
+                    increase_level(username)
+                    is_level_already_increased = True
+            elif end == 0:
+                end_rect_color = (200, 0, 0)
+                end_text = f"Loss! Level {cur_level} not completed."
 
-        set_sun_counter(screen, int(sun_counter))
-        if sun_counter < 9999:
-            sun_counter += 0.1
+            pygame.draw.rect(screen, end_rect_color, (0, height // 3, width, height // 3), 0)
+            pygame.draw.rect(screen, (0, 0, 0), (0, height // 3, width, 5), 0)
+            pygame.draw.rect(screen, (0, 0, 0), (0, height // 1.5, width, 5), 0)
+
+            font1 = pygame.font.Font(None, 80)
+            text1 = font1.render(str(end_text), True, (0, 0, 0))
+            screen.blit(text1, (width // 2 - text1.get_width() // 2, height // 2 - text1.get_height() // 2 - 20))
+
+            font2 = pygame.font.Font(None, 25)
+            text2 = font2.render(str(f"*Click anywhere to continue*"), True, (0, 0, 0))
+            screen.blit(text2, (width // 2 - text2.get_width() // 2, height // 2 - text2.get_height() // 2 + 50))
 
         clock.tick(fps)
         pygame.display.flip()
