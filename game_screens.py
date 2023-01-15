@@ -204,7 +204,7 @@ def level_screen(fps, level, username, cur_level):
     user_level = check_level(username)
     is_motion_on_cell = False
     is_level_already_increased = False
-    end = 1  # -1 - ongoing, 0 - loss, 1 - win
+    end = -1  # -1 - ongoing, 0 - loss, 1 - win
     sun_counter = 0
     counter = 0
 
@@ -219,7 +219,8 @@ def level_screen(fps, level, username, cur_level):
                     if not(board.check_if_occupied(event.pos)):
                         if sun_counter >= 50:
                             board.occupied(event.pos)
-                            create_plant(board.get_cell(event.pos), (board_left, board_top),
+                            # was without first arg board:
+                            create_plant(board, board.get_cell(event.pos), (board_left, board_top),
                                          cell_size, all_player_sprites)
                             sun_counter -= 50
                 else:
@@ -262,7 +263,7 @@ def level_screen(fps, level, username, cur_level):
 
             set_sun_counter(screen, int(sun_counter))
             if sun_counter < 9999:
-                sun_counter += 0.1
+                sun_counter += 0.5
         else:
             if end == 1:
                 end_rect_color = (0, 200, 50)

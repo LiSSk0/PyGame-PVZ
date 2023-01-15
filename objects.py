@@ -1,11 +1,13 @@
 import pygame
 
-tile_images = {
+PLANT_HP = 150
+TILE_IMG = {
     'grass1': pygame.image.load('textures/grass1.png'),
     'grass2': pygame.image.load('textures/grass2.png')
 }
 
 
+# Игровое поле
 class Board:
     def __init__(self, width, height):
         self.width = width
@@ -29,8 +31,8 @@ class Board:
         # rect_in = image.get_rect()
         # new_x = rect_in.width * 2
         # new_y = rect_in.height // 2
-        grass1 = pygame.transform.scale(tile_images['grass1'], (self.cell_size - 2, self.cell_size - 2))
-        grass2 = pygame.transform.scale(tile_images['grass2'], (self.cell_size - 2, self.cell_size - 2))
+        grass1 = pygame.transform.scale(TILE_IMG['grass1'], (self.cell_size - 2, self.cell_size - 2))
+        grass2 = pygame.transform.scale(TILE_IMG['grass2'], (self.cell_size - 2, self.cell_size - 2))
 
         # board borders
         for x in range(self.width):
@@ -49,13 +51,15 @@ class Board:
                     screen.blit(grass2, (self.left + x * self.cell_size + 1, self.top + y * self.cell_size + 1))
                     swap = True
 
+    # Занять клетку растением
     def occupied(self, pos):
         try:
             a, b = self.get_cell(pos)
         except Exception:
             return
-        self.board[b][a][1] = 1
+        self.board[b][a][1] = PLANT_HP
 
+    # Проверка свободна ли клетка
     def check_if_occupied(self, pos):
         try:
             a, b = self.get_cell(pos)
@@ -65,6 +69,15 @@ class Board:
             return False
         return True
 
+    # Нанести урон растению в клетке
+    def do_damage(self, pos, damage):
+        a, b = self.get_cell(pos)
+        if self.board[b][a][1] < damage:
+            self.board[b][a][1] = 0  # cell is occupied so no exceptions
+        else:
+            self.board[b][a][1] -= damage
+
+    # Получить координаты клетки
     def get_cell(self, mouse_pos):
         x, y = mouse_pos[0] - self.left, mouse_pos[1] - self.top
         if (x < 0) or (x > self.width * self.cell_size) or (y < 0) or (y > self.height * self.cell_size):
@@ -81,6 +94,7 @@ class Board:
     #     return cell_coords
 
 
+# Главный класс зомби
 class ZombieDefault(pygame.sprite.Sprite):
     def __init__(self, sheet, columns, rows, pos, board, *group):
         super().__init__(*group)
@@ -94,6 +108,7 @@ class ZombieDefault(pygame.sprite.Sprite):
         self.counter = 0
 
         self.hp = 50
+        self.damage = 5
         self.velocity = 3
 
     def cut_sheet(self, sheet, columns, rows):
@@ -112,26 +127,33 @@ class ZombieDefault(pygame.sprite.Sprite):
                 self.image = self.frames[self.cur_frame]
                 self.counter //= 10
                 if not self.board.check_if_occupied((self.rect.x, self.rect.y + self.image.get_height() // 2)):
-                    self.rect.x -= self.velocity
+                    self.rect.x -= self.velocity * 2
+                else:
+                    self.board.do_damage((self.rect.x, self.rect.y + self.image.get_height() // 2), self.damage)
             self.counter += 1
 
 
+# Вид зомби 1
 class Zombie1(ZombieDefault):
     def __init__(self, sheet, columns, rows, pos, board_left, *group):
         super().__init__(sheet, columns, rows, pos, board_left, *group)
 
         self.hp = 100
+        self.damage = 8
 
 
+# Вид зомби 2
 class ZombieWoman(ZombieDefault):
     def __init__(self, sheet, columns, rows, pos, board_left, *group):
         super().__init__(sheet, columns, rows, pos, board_left, *group)
 
         self.hp = 75
+        self.damage = 10
 
 
+# Класс игрока для выставления растений
 class Player(pygame.sprite.Sprite):
-    def __init__(self, sheet, columns, rows, x, y, *players):
+    def __init__(self, board, sheet, columns, rows, x, y, *players):
         super().__init__(*players)
         self.counter = 0
         self.frames = []
@@ -139,8 +161,9 @@ class Player(pygame.sprite.Sprite):
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.rect = self.rect.move(x, y)
+        self.board = board
 
-        self.hp = 50
+        self.hp = PLANT_HP
         self.damage = 20
 
     def cut_sheet(self, sheet, columns, rows):
@@ -153,12 +176,16 @@ class Player(pygame.sprite.Sprite):
                     frame_location, self.rect.size)))
 
     def update(self):
+        if not self.board.check_if_occupied((self.rect.x, self.rect.y + self.image.get_height() // 2)):
+            self.kill()
+
         if self.counter % 15 == 0:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
         self.counter += 1
 
 
+# Класс игрового уровня
 class Level:
     def __init__(self, zombies):
         self.default_cnt = zombies[0]

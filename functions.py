@@ -82,10 +82,9 @@ def create_zombie_column(count, type, board, cell_size, width, sheet, sheet_xy, 
             zombie = ZombieWoman(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         else:
             print(f"WRONG PARAM {type}: at func create_zombie_column")
-       # print(zombie.hp)
 
 
-def create_plant(pos, tops, cell_size, all_player_sprites):
+def create_plant(board, pos, tops, cell_size, all_player_sprites):
     a = pos[0] * cell_size + tops[0]
     b = pos[1] * cell_size + tops[1]
 
@@ -94,7 +93,7 @@ def create_plant(pos, tops, cell_size, all_player_sprites):
     # new_x, new_y = rect_in.width // 1.15, rect_in.height // 1.15
     # plant = pygame.transform.scale(plant, (new_x, new_y))
 
-    player = Player(plant, 5, 1, a, b)
+    player = Player(board, plant, 5, 1, a, b)
     all_player_sprites.add(player)
 
 
@@ -120,23 +119,23 @@ def load_zombie_pic(type):
     return zombie
 
 
-def load_image(name, colorkey=None):
-    fullname = os.path.join(name)
-
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
-
-    return image
+# def load_image(name, colorkey=None):
+#     fullname = os.path.join(name)
+#
+#     if not os.path.isfile(fullname):
+#         print(f"Файл с изображением '{fullname}' не найден")
+#         sys.exit()
+#     image = pygame.image.load(fullname)
+#
+#     if colorkey is not None:
+#         image = image.convert()
+#         if colorkey == -1:
+#             colorkey = image.get_at((0, 0))
+#         image.set_colorkey(colorkey)
+#     else:
+#         image = image.convert_alpha()
+#
+#     return image
 
 
 def addUser(user):
