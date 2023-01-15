@@ -12,8 +12,8 @@ def terminate():
 
 
 # Экран регистрации
-def reg_screen(width, height):
-    size = width, height
+def reg_screen():
+    size = width, height = 1100, 600
     screen = pygame.display.set_mode(size)
 
     username = ''
@@ -88,7 +88,6 @@ def reg_screen(width, height):
 # Экран меню выбора уровней
 def menu_screen(fps, username):
     size = width, height = 1100, 600
-    # os.environ['SDL_VIDEO_CENTERED'] = '1'
     screen = pygame.display.set_mode(size)
 
     screen.fill('darkblue')
@@ -141,7 +140,7 @@ def menu_screen(fps, username):
         nickname = nickname[:8] + "..."
     text_username = font.render(str("Username: '" + nickname + "'"), True, (150, 0, 200))
     screen.blit(text_username, (10, 10))
-    text_username = font.render(str("Level: " + str(level - 1)), True, (150, 0, 200))
+    text_username = font.render(str("Completed levels: " + str(level - 1)), True, (150, 0, 200))
     screen.blit(text_username, (10, 50))
 
     clock = pygame.time.Clock()
@@ -179,7 +178,10 @@ def menu_screen(fps, username):
 
 
 # Экран уровня
-def level_screen(screen, width, height, fps, level, username):
+def level_screen(fps, level, username, cur_level):
+    size = width, height = 1100, 600
+    screen = pygame.display.set_mode(size)
+
     level_bg = pygame.image.load('textures/wallpaperlevel.png')
     screen.blit(level_bg, [0, 0])
 
@@ -199,10 +201,10 @@ def level_screen(screen, width, height, fps, level, username):
         'grass': level.grass_cnt
     }
 
-    cur_level = check_level(username) + 1
+    user_level = check_level(username)
     is_motion_on_cell = False
     is_level_already_increased = False
-    end = 1
+    end = 1  # -1 - ongoing, 0 - loss, 1 - win
     sun_counter = 0
     counter = 0
 
@@ -221,9 +223,9 @@ def level_screen(screen, width, height, fps, level, username):
                                          cell_size, all_player_sprites)
                             sun_counter -= 50
                 else:
-                    return end
+                    return
 
-            if event.type == pygame.MOUSEMOTION:
+            if event.type == pygame.MOUSEMOTION and end == -1:
                 cell_coord = board.get_cell(event.pos)
                 if cell_coord is not None:
                     is_motion_on_cell = True
@@ -265,12 +267,12 @@ def level_screen(screen, width, height, fps, level, username):
             if end == 1:
                 end_rect_color = (0, 200, 50)
                 end_text = f"Win! Level {cur_level} completed."
-                if not is_level_already_increased:
+                if not is_level_already_increased and cur_level > user_level:
                     increase_level(username)
                     is_level_already_increased = True
             elif end == 0:
                 end_rect_color = (200, 0, 0)
-                end_text = f"Loss! Level {cur_level} not completed."
+                end_text = f"Loose! Level {cur_level} not completed."
 
             pygame.draw.rect(screen, end_rect_color, (0, height // 3, width, height // 3), 0)
             pygame.draw.rect(screen, (0, 0, 0), (0, height // 3, width, 5), 0)
