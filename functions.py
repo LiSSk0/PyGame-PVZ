@@ -15,6 +15,7 @@ def decorations(screen, width, height):
     new_y = rect_in.height // 8
     bush = pygame.transform.scale(bush, (new_x, new_y))
 
+
     bushes_count = 10
     step = height // bushes_count
     for i in range(bushes_count - 2):
@@ -43,6 +44,14 @@ def decorations(screen, width, height):
     shovel = pygame.transform.scale(shovel, (new_x, new_y))
     screen.blit(shovel, [width - new_x, height - new_y])
 
+    #shooter
+    # shoot = pygame.image.load('textures/shooter_im.png')
+    # rect_in = shoot.get_rect()
+    # new_x = rect_in.width // 5
+    # new_y = rect_in.height // 5
+    # shoot = pygame.transform.scale(shoot, (new_x, new_y))
+    # pygame.draw.rect(screen, '#42789C', (25, 60, new_x, new_y))
+    # screen.blit(shoot, [25, 60])
 
 def set_sun_counter(screen, count):
     font = pygame.font.Font(None, 40)
@@ -83,19 +92,39 @@ def create_zombie_column(count, type, board, cell_size, width, sheet, sheet_xy, 
         else:
             print(f"WRONG PARAM {type}: at func create_zombie_column")
 
+def check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_group, top_y, top_x, cell_size, board):
+    coords = []
+    for i in all_player_sprites:
+        coords.append([(i.rect.x - top_x) // cell_size, (i.rect.y - top_y) // cell_size])
+    a = []
+    for i in zombies_group:
+         zy = (i.rect.y - top_y) // cell_size
+         zx = (i.rect.x - top_x) // cell_size
+         for x, y in coords:
+             if y == zy and zx < 9:
+                 if i.count_return():
+                     shooter_balls(screen, board, x, y, top_y, top_x, cell_size, i,
+                                   balls_group)
+                     for b in balls_group:
+                         if zy not in a and (b.a - top_x) // cell_size == zx:
+                             i.killing()
+         a.append(zy)
+
 
 def create_plant(board, pos, tops, cell_size, all_player_sprites):
     a = pos[0] * cell_size + tops[0]
     b = pos[1] * cell_size + tops[1]
 
     plant = pygame.image.load('textures/shooter1.png')
-    # rect_in = plant.get_rect()
-    # new_x, new_y = rect_in.width // 1.15, rect_in.height // 1.15
-    # plant = pygame.transform.scale(plant, (new_x, new_y))
-
     player = Player(board, plant, 5, 1, a, b)
     all_player_sprites.add(player)
 
+def shooter_balls(screen, board, x, y, top, left, cell_size, zombie, balls_group):
+    a = x * cell_size + left + cell_size
+    b = y * cell_size + top + cell_size // 2
+
+    myball = Ball(screen, board, a, b, top, left, cell_size, zombie, balls_group)
+    balls_group.add(myball)
 
 def load_zombie_pic(type):
     if type == 'default':
@@ -255,3 +284,12 @@ def top5Table(screen, width, height, users):
             screen.blit(text_lvl, (width // 1.75 + 330, y))
 
             y += 75
+
+# def shooter_balls(board, pos, tops, cell_size, balls_group):
+#     a = pos[0] * cell_size + tops[0]
+#     b = pos[1] * cell_size + tops[1]
+#
+#     ball = pygame.draw.circle(board, '#000000', (a, b), 10)
+#
+#     #ball = Player(board, img, 5, 1, a, b)
+#     balls_group.add(ball)
