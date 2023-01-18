@@ -182,11 +182,17 @@ def level_screen(fps, level, username, cur_level):
     size = width, height = 1100, 600
     screen = pygame.display.set_mode(size)
 
+    balls_group = pygame.sprite.Group()
+
     level_bg = pygame.image.load('textures/wallpaperlevel.png')
     screen.blit(level_bg, [0, 0])
 
     zombies_group = pygame.sprite.Group()
     all_player_sprites = pygame.sprite.Group()
+    border_group = pygame.sprite.Group()
+
+    border_sprite = create_border_sprite(width, height)
+    border_group.add(border_sprite)
 
     board = Board(9, 5)
     board_left, board_top, cell_size = width // 4.4, height // 5, width // 13
@@ -200,7 +206,6 @@ def level_screen(fps, level, username, cur_level):
         'woman': level.woman_cnt,
         'grass': level.grass_cnt
     }
-
     user_level = check_level(username)
     is_motion_on_cell = False
     is_level_already_increased = False
@@ -214,15 +219,16 @@ def level_screen(fps, level, username, cur_level):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONUP:
                 if end == -1:
                     if not(board.check_if_occupied(event.pos)):
                         if sun_counter >= 50:
                             board.occupied(event.pos)
-                            # was without first arg board:
-                            create_plant(board, board.get_cell(event.pos), (board_left, board_top),
-                                         cell_size, all_player_sprites)
-                            sun_counter -= 50
+                            cell = board.get_cell(event.pos)
+                            if cell is not None:
+                                create_plant(board, board.get_cell(event.pos), (board_left, board_top),
+                                             cell_size, all_player_sprites)
+                                sun_counter -= 50
                 else:
                     return
 
@@ -232,7 +238,6 @@ def level_screen(fps, level, username, cur_level):
                     is_motion_on_cell = True
                 else:
                     is_motion_on_cell = False
-
         screen.blit(level_bg, [0, 0])
 
         if end == -1:
@@ -244,26 +249,33 @@ def level_screen(fps, level, username, cur_level):
             zombies_group.draw(screen)
             all_player_sprites.update()
             all_player_sprites.draw(screen)
+            border_group.draw(screen)
+
+            check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_group, board_top, board_left,
+                                      cell_size, board)
+            balls_group.update()
             decorations(screen, width, height)
 
             types = ['default', 'woman', 'grass']
             if counter % 500 == 0:
                 if (zombie_count['default'] + zombie_count['woman'] + zombie_count['grass']) > 0:
-                    type = choice(types)
-                    while zombie_count[type] == 0:
-                        type = choice(types)
-                    create_zombie_column(1, type, board, cell_size, width,
-                                         load_zombie_pic(type), (6, 1), zombies_group)
-                    zombie_count[type] -= 1
-                else:  # when zombies have ended
-                    if zombies_group.__len__() == 0:
-                        end = 1
+                    zombie_type = choice(types)
+                    while zombie_count[zombie_type] == 0:
+                        zombie_type = choice(types)
+                    create_zombie_column(1, zombie_type, board, cell_size, width,
+                                         load_zombie_pic(zombie_type), (6, 1), zombies_group)
+                    zombie_count[zombie_type] -= 1
                 counter //= 500
             counter += 1
 
+            if pygame.sprite.spritecollideany(border_sprite, zombies_group):
+                end = 0
+            elif zombies_group.__len__() == 0:
+                end = 1
+
             set_sun_counter(screen, int(sun_counter))
             if sun_counter < 9999:
-                sun_counter += 0.5
+                sun_counter += 0.15
         else:
             if end == 1:
                 end_rect_color = (0, 200, 50)
@@ -273,7 +285,7 @@ def level_screen(fps, level, username, cur_level):
                     is_level_already_increased = True
             elif end == 0:
                 end_rect_color = (200, 0, 0)
-                end_text = f"Loose! Level {cur_level} not completed."
+                end_text = f"Loss! Level {cur_level} not completed."
 
             pygame.draw.rect(screen, end_rect_color, (0, height // 3, width, height // 3), 0)
             pygame.draw.rect(screen, (0, 0, 0), (0, height // 3, width, 5), 0)

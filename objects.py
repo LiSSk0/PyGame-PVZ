@@ -31,6 +31,7 @@ class Board:
         # rect_in = image.get_rect()
         # new_x = rect_in.width * 2
         # new_y = rect_in.height // 2
+
         grass1 = pygame.transform.scale(TILE_IMG['grass1'], (self.cell_size - 2, self.cell_size - 2))
         grass2 = pygame.transform.scale(TILE_IMG['grass2'], (self.cell_size - 2, self.cell_size - 2))
 
@@ -85,14 +86,6 @@ class Board:
         else:
             return int(x) // self.cell_size, y // self.cell_size
 
-    # def get_motion(self, mouse_pos):
-    #     cell_coords = self.get_cell(mouse_pos)
-    #     if cell_coords is not None:
-    #         self.on_click(cell_coords)
-    #
-    # def on_click(self, cell_coords):
-    #     return cell_coords
-
 
 # Главный класс зомби
 class ZombieDefault(pygame.sprite.Sprite):
@@ -118,6 +111,18 @@ class ZombieDefault(pygame.sprite.Sprite):
                 frame_location = (self.rect.w * i, self.rect.h * j)
                 self.frames.append(sheet.subsurface(pygame.Rect(frame_location, self.rect.size)))
 
+    def count_return(self):
+        if self.counter % 15 == 0:
+            return True
+        return False
+
+    def killing(self):
+        if self.counter % 15 == 0:
+            if self.hp > self.damage:
+                self.hp -= self.damage
+            else:
+                self.kill()
+
     def update(self):
         if self.rect.x <= self.border:
             self.kill()
@@ -125,7 +130,6 @@ class ZombieDefault(pygame.sprite.Sprite):
             if self.counter % 10 == 0:
                 self.cur_frame = (self.cur_frame + 1) % len(self.frames)
                 self.image = self.frames[self.cur_frame]
-                self.counter //= 10
                 if not self.board.check_if_occupied((self.rect.x, self.rect.y + self.image.get_height() // 2)):
                     self.rect.x -= self.velocity * 2
                 else:
@@ -149,6 +153,30 @@ class ZombieWoman(ZombieDefault):
 
         self.hp = 75
         self.damage = 10
+
+
+# Класс пуль-шариков
+class Ball(pygame.sprite.Sprite):
+    def __init__(self, screen, board, row, col,  top, left, sz,  zombie, *group):
+        super().__init__(*group)
+        self.sz = sz
+        self.a, self.b = row, col
+        self.top, self.left = top, left
+        self.board = board
+        self.screen = screen
+        self.zombie = zombie
+
+        self.image = pygame.image.load('textures/ball.png')
+        self.image = pygame.transform.scale(self.image, (610 // 18, 527 // 18))
+
+    def check(self):
+        if self.a - 5 <= self.zombie.rect.x <= self.a + 5:
+            self.kill()
+
+    def update(self):
+        self.screen.blit(self.image, [self.a, self.b])
+        self.a += 5
+        self.check()
 
 
 # Класс игрока для выставления растений

@@ -18,7 +18,7 @@ def main():
         level = menu_screen(FPS, username)
 
         if level == 1:
-            level_screen(FPS + 50, Level((10, 5, 3)), username, level)
+            level_screen(FPS, Level((10, 5, 3)), username, level)
         if level == 2:
             level_screen(FPS, Level((20, 10, 5)), username, level)
         if level == 3:
@@ -27,8 +27,6 @@ def main():
             level_screen(FPS, Level((35, 25, 15)), username, level)
         if level == 5:
             level_screen(FPS, Level((40, 25, 35)), username, level)
-
-    # pygame.quit()
 
 
 if __name__ == '__main__':

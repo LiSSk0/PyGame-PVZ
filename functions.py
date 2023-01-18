@@ -84,17 +84,55 @@ def create_zombie_column(count, type, board, cell_size, width, sheet, sheet_xy, 
             print(f"WRONG PARAM {type}: at func create_zombie_column")
 
 
+def check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_group, top_y, top_x, cell_size, board):
+    coords = []
+    for i in all_player_sprites:
+        coords.append([(i.rect.x - top_x) // cell_size, (i.rect.y - top_y) // cell_size])
+    a = []
+    for i in zombies_group:
+         zy = (i.rect.y - top_y) // cell_size
+         zx = (i.rect.x - top_x) // cell_size
+         for x, y in coords:
+             if y == zy and zx < 9:
+                 if i.count_return():
+                     shooter_balls(screen, board, x, y, top_y, top_x, cell_size, i,
+                                   balls_group)
+                     for b in balls_group:
+                         if zy not in a and (b.a - top_x) // cell_size == zx:
+                             i.killing()
+         a.append(zy)
+
+
 def create_plant(board, pos, tops, cell_size, all_player_sprites):
     a = pos[0] * cell_size + tops[0]
     b = pos[1] * cell_size + tops[1]
 
     plant = pygame.image.load('textures/shooter1.png')
-    # rect_in = plant.get_rect()
-    # new_x, new_y = rect_in.width // 1.15, rect_in.height // 1.15
-    # plant = pygame.transform.scale(plant, (new_x, new_y))
-
     player = Player(board, plant, 5, 1, a, b)
     all_player_sprites.add(player)
+
+
+def shooter_balls(screen, board, x, y, top, left, cell_size, zombie, balls_group):
+    a = x * cell_size + left + cell_size
+    b = y * cell_size + top + cell_size // 2
+
+    myball = Ball(screen, board, a, b, top, left, cell_size, zombie, balls_group)
+    balls_group.add(myball)
+
+
+def create_border_sprite(width, height):
+    border_sprite = pygame.sprite.Sprite()
+
+    border_sprite.image = pygame.image.load("textures/border2.png")
+    rect_in = border_sprite.image.get_rect()
+    new_x, new_y = rect_in.width // 5, rect_in.height * 6.75
+    border_sprite.image = pygame.transform.scale(border_sprite.image, (new_x, new_y))
+
+    border_sprite.rect = border_sprite.image.get_rect()
+    border_sprite.rect.x = width // 4.4
+    border_sprite.rect.y = height // 5 + 1
+
+    return border_sprite
 
 
 def load_zombie_pic(type):
@@ -117,25 +155,6 @@ def load_zombie_pic(type):
         print(f"WRONG PARAM {type}: at func load_zombie_pic")
         return None
     return zombie
-
-
-# def load_image(name, colorkey=None):
-#     fullname = os.path.join(name)
-#
-#     if not os.path.isfile(fullname):
-#         print(f"Файл с изображением '{fullname}' не найден")
-#         sys.exit()
-#     image = pygame.image.load(fullname)
-#
-#     if colorkey is not None:
-#         image = image.convert()
-#         if colorkey == -1:
-#             colorkey = image.get_at((0, 0))
-#         image.set_colorkey(colorkey)
-#     else:
-#         image = image.convert_alpha()
-#
-#     return image
 
 
 def addUser(user):
