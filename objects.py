@@ -28,10 +28,6 @@ class Board:
         self.cell_size = cell_size
 
     def render(self, screen):
-        # rect_in = image.get_rect()
-        # new_x = rect_in.width * 2
-        # new_y = rect_in.height // 2
-
         grass1 = pygame.transform.scale(TILE_IMG['grass1'], (self.cell_size - 2, self.cell_size - 2))
         grass2 = pygame.transform.scale(TILE_IMG['grass2'], (self.cell_size - 2, self.cell_size - 2))
 
@@ -81,7 +77,7 @@ class Board:
     # Получить координаты клетки
     def get_cell(self, mouse_pos):
         x, y = mouse_pos[0] - self.left, mouse_pos[1] - self.top
-        if (x < 0) or (x > self.width * self.cell_size) or (y < 0) or (y > self.height * self.cell_size):
+        if (x < 0) or (x > self.width * self.cell_size - 1) or (y < 0) or (y > self.height * self.cell_size - 1):
             return None
         else:
             return int(x) // self.cell_size, y // self.cell_size
@@ -112,7 +108,7 @@ class ZombieDefault(pygame.sprite.Sprite):
                 self.frames.append(sheet.subsurface(pygame.Rect(frame_location, self.rect.size)))
 
     def count_return(self):
-        if self.counter % 15 == 0:
+        if self.counter % 25 == 0:
             return True
         return False
 
@@ -131,7 +127,7 @@ class ZombieDefault(pygame.sprite.Sprite):
                 self.cur_frame = (self.cur_frame + 1) % len(self.frames)
                 self.image = self.frames[self.cur_frame]
                 if not self.board.check_if_occupied((self.rect.x, self.rect.y + self.image.get_height() // 2)):
-                    self.rect.x -= self.velocity * 2
+                    self.rect.x -= self.velocity
                 else:
                     self.board.do_damage((self.rect.x, self.rect.y + self.image.get_height() // 2), self.damage)
             self.counter += 1
@@ -192,7 +188,7 @@ class Player(pygame.sprite.Sprite):
         self.board = board
 
         self.hp = PLANT_HP
-        self.damage = 20
+        self.damage = 12
 
     def cut_sheet(self, sheet, columns, rows):
         self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,

@@ -59,48 +59,46 @@ def generate_zombie_coords(board_top, cell_size, width, count):
             coords.append((width, board_top + line * cell_size))
     else:
         i = 0
-        # print("CYCLE: Started in func 'generate_zombie_coords'")
         while i < count:
             line = randint(0, 4)
             coord = (width, board_top + line * cell_size)
             if coord not in coords:
                 coords.append(coord)
                 i += 1
-        # print("CYCLE: Finished in func 'generate_zombie_coords'")
-
     return sorted(coords)
 
 
-def create_zombie_column(count, type, board, cell_size, width, sheet, sheet_xy, group):
+def create_zombie_column(count, zombie_type, board, cell_size, width, sheet, sheet_xy, group):
     coords = generate_zombie_coords(board.top, cell_size, width, count)
     for i in range(count):
-        if type == 'default':
+        if zombie_type == 'default':
             zombie = ZombieDefault(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
-        elif type == 'grass':
+        elif zombie_type == 'grass':
             zombie = Zombie1(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
-        elif type == 'woman':
+        elif zombie_type == 'woman':
             zombie = ZombieWoman(sheet, sheet_xy[0], sheet_xy[1], coords[i], board, group)
         else:
-            print(f"WRONG PARAM {type}: at func create_zombie_column")
+            # print(f"WRONG PARAM {zombie_type}: at func create_zombie_column")
+            pass
 
 
 def check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_group, top_y, top_x, cell_size, board):
     coords = []
+    a = []
+
     for i in all_player_sprites:
         coords.append([(i.rect.x - top_x) // cell_size, (i.rect.y - top_y) // cell_size])
-    a = []
     for i in zombies_group:
-         zy = (i.rect.y - top_y) // cell_size
-         zx = (i.rect.x - top_x) // cell_size
-         for x, y in coords:
-             if y == zy and zx < 9:
-                 if i.count_return():
-                     shooter_balls(screen, board, x, y, top_y, top_x, cell_size, i,
-                                   balls_group)
-                     for b in balls_group:
-                         if zy not in a and (b.a - top_x) // cell_size == zx:
-                             i.killing()
-         a.append(zy)
+        zy = (i.rect.y - top_y) // cell_size
+        zx = (i.rect.x - top_x) // cell_size
+        for x, y in coords:
+            if y == zy and zx < 9:
+                if i.count_return():
+                    shooter_balls(screen, board, x, y, top_y, top_x, cell_size, i, balls_group)
+                    for b in balls_group:
+                        if zy not in a and (b.a - top_x) // cell_size == zx:
+                            i.killing()
+        a.append(zy)
 
 
 def create_plant(board, pos, tops, cell_size, all_player_sprites):
@@ -123,7 +121,7 @@ def shooter_balls(screen, board, x, y, top, left, cell_size, zombie, balls_group
 def create_border_sprite(width, height):
     border_sprite = pygame.sprite.Sprite()
 
-    border_sprite.image = pygame.image.load("textures/border2.png")
+    border_sprite.image = pygame.image.load("textures/border.png")
     rect_in = border_sprite.image.get_rect()
     new_x, new_y = rect_in.width // 5, rect_in.height * 6.75
     border_sprite.image = pygame.transform.scale(border_sprite.image, (new_x, new_y))
@@ -135,24 +133,24 @@ def create_border_sprite(width, height):
     return border_sprite
 
 
-def load_zombie_pic(type):
-    if type == 'default':
-        zombie = pygame.image.load('textures/zombiedefault_walk6.png')
+def load_zombie_pic(z_type):
+    if z_type == 'default':
+        zombie = pygame.image.load('textures/zombiedefault_walk.png')
         rect_in = zombie.get_rect()
         new_x, new_y = rect_in.width // 1.5, rect_in.height // 1.7
         zombie = pygame.transform.scale(zombie, (new_x, new_y))
-    elif type == 'grass':
-        zombie = pygame.image.load('textures/zombie1_walk7.png')
+    elif z_type == 'grass':
+        zombie = pygame.image.load('textures/zombie1_walk.png')
         rect_in = zombie.get_rect()
         new_x, new_y = rect_in.width // 1.5, rect_in.height // 1.5
         zombie = pygame.transform.scale(zombie, (new_x, new_y))
-    elif type == 'woman':
-        zombie = pygame.image.load('textures/zombiewoman_walk5.png')
+    elif z_type == 'woman':
+        zombie = pygame.image.load('textures/zombiewoman_walk.png')
         rect_in = zombie.get_rect()
         new_x, new_y = rect_in.width // 3, rect_in.height // 3
         zombie = pygame.transform.scale(zombie, (new_x, new_y))
     else:
-        print(f"WRONG PARAM {type}: at func load_zombie_pic")
+        print(f"WRONG PARAM {z_type}: at func load_zombie_pic")
         return None
     return zombie
 

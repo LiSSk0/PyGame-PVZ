@@ -1,6 +1,6 @@
 import pygame
 import os
-from objects import Board
+from objects import *
 from functions import *
 from random import randint, choice
 
@@ -277,6 +277,7 @@ def level_screen(fps, level, username, cur_level):
             if sun_counter < 9999:
                 sun_counter += 0.15
         else:
+            end_rect_color, end_text = "", ""
             if end == 1:
                 end_rect_color = (0, 200, 50)
                 end_text = f"Win! Level {cur_level} completed."
