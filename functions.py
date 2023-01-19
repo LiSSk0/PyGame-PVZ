@@ -83,27 +83,29 @@ def create_zombie_column(count, zombie_type, board, cell_size, width, sheet, she
 
 
 def check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_group, top_y, top_x, cell_size, board):
-    coords = []
-    a = []
-    zmb = []
+    player_coordinates = []
+    zombie_coordinations = []
+    zombies = []
 
-    for i in zombies_group:
-        zy = (i.rect.y - top_y) // cell_size
-        if zy not in a:
-            a.append(zy)
-            zmb.append(i)
-    for i in all_player_sprites:
-        coords.append([(i.rect.x - top_x) // cell_size, (i.rect.y - top_y) // cell_size])
-    for i in zmb:
-        zy = (i.rect.y - top_y) // cell_size
-        zx = (i.rect.x - top_x) // cell_size
-        for x, y in coords:
+    for zombie in zombies_group:
+        zy = (zombie.rect.y - top_y) // cell_size
+        if zy not in zombie_coordinations:
+            zombie_coordinations.append(zy)
+            zombies.append(zombie)
+    for plant in all_player_sprites:
+        player_coordinates.append([(plant.rect.x - top_x) // cell_size, (plant.rect.y - top_y) // cell_size])
+    for zombie in zombies:
+        zy = (zombie.rect.y - top_y) // cell_size
+        zx = (zombie.rect.x - top_x) // cell_size
+        for x, y in player_coordinates:
             if y == zy and zx < 9:
-                if i.count_return():
-                    shooter_balls(screen, board, x, y, top_y, top_x, cell_size, i, balls_group)
+                if zombie.count_return():
+                    point_x = x * cell_size + top_x + cell_size
+                    point_y = y * cell_size + top_y + cell_size // 2
+                    shooter_balls(screen, board, point_x, point_y, zombie, balls_group)
                     for b in balls_group:
-                        if (b.x - top_x) // cell_size == zx:
-                            i.killing()
+                        if (b.rect.x - top_x) // cell_size == zx:
+                            zombie.killing()
 
 
 def create_plant(board, pos, tops, cell_size, all_player_sprites):
@@ -115,11 +117,8 @@ def create_plant(board, pos, tops, cell_size, all_player_sprites):
     all_player_sprites.add(player)
 
 
-def shooter_balls(screen, board, x, y, top, left, cell_size, zombie, balls_group):
-    a = x * cell_size + left + cell_size
-    b = y * cell_size + top + cell_size // 2
-
-    myball = Ball(screen, board, a, b, top, left, cell_size, zombie, balls_group)
+def shooter_balls(screen, board, x, y, zombie, balls_group):
+    myball = Ball(load_ball_pic(), board, x, y, zombie, balls_group)
     balls_group.add(myball)
 
 
@@ -137,6 +136,12 @@ def create_border_sprite(width, height):
 
     return border_sprite
 
+def load_ball_pic():
+    ball = pygame.image.load('textures/ball.png')
+    rect_in = ball.get_rect()
+    new_x, new_y = rect_in.width // 18, rect_in.height // 18
+    ball = pygame.transform.scale(ball, (new_x, new_y))
+    return ball
 
 def load_zombie_pic(z_type):
     if z_type == 'default':
@@ -158,9 +163,6 @@ def load_zombie_pic(z_type):
         print(f"WRONG PARAM {z_type}: at func load_zombie_pic")
         return None
     return zombie
-
-#def shovel_activated(self, board):
-
 
 
 def addUser(user):

@@ -259,6 +259,7 @@ def level_screen(fps, level, username, cur_level):
             check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_group, board_top, board_left,
                                       cell_size, board)
             balls_group.update()
+            balls_group.draw(screen)
             decorations(screen, width, height)
 
             types = ['default', 'woman', 'grass']

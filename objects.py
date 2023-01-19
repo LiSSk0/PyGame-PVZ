@@ -6,8 +6,7 @@ TILE_IMG = {
     'grass2': pygame.image.load('textures/grass2.png')
 }
 
-ball_image = pygame.image.load('textures/ball.png')
-ball_image = pygame.transform.scale(ball_image, (610 // 18, 527 // 18))
+
 
 # Игровое поле
 class Board:
@@ -157,23 +156,20 @@ class ZombieWoman(ZombieDefault):
 
 # Класс пуль-шариков
 class Ball(pygame.sprite.Sprite):
-    def __init__(self, screen, board, row, col,  top, left, sz,  zombie, *group):
+    def __init__(self, ball, board, x, y,  zombie, *group):
         super().__init__(*group)
-        self.sz = sz
-        self.x, self.y = row, col
-        self.top, self.left = top, left
+        self.image = ball
+        self.rect = self.image.get_rect()
+        self.rect = self.rect.move(x, y)
         self.board = board
-        self.screen = screen
         self.zombie = zombie
 
-
     def check(self):
-        if self.x - 15 <= self.zombie.rect.x <= self.x + 15:
+        if self.rect.x - 15 <= self.zombie.rect.x <= self.rect.x + 15:
             self.kill()
 
     def update(self):
-        self.screen.blit(ball_image, [self.x, self.y])
-        self.x += 5
+        self.rect.x += 5
         self.check()
 
 
