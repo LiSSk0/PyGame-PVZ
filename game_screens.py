@@ -103,6 +103,7 @@ def menu_screen(fps, username):
     tree_pic = pygame.transform.scale(tree_pic, (300, 550))
     screen.blit(tree_pic, (25, height // 6))
 
+
     button = pygame.image.load('textures/button.png')
     button_size = (275, 90)
     button = pygame.transform.scale(button, button_size)
@@ -275,7 +276,7 @@ def level_screen(fps, level, username, cur_level):
 
             set_sun_counter(screen, int(sun_counter))
             if sun_counter < 9999:
-                sun_counter += 0.15
+                sun_counter += 0.1
         else:
             end_rect_color, end_text = "", ""
             if end == 1:

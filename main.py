@@ -18,7 +18,7 @@ def main():
         level = menu_screen(FPS, username)
 
         if level == 1:
-            level_screen(FPS, Level((10, 5, 3)), username, level)
+            level_screen(FPS, Level((1, 1, 1)), username, level)
         if level == 2:
             level_screen(FPS, Level((20, 10, 5)), username, level)
         if level == 3:

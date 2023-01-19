@@ -36,12 +36,12 @@ def decorations(screen, width, height):
     screen.blit(sun, [25, 15])
 
     # shovel:
-    shovel = pygame.image.load('textures/shovel.png')
-    rect_in = shovel.get_rect()
-    new_x = rect_in.width // 5
-    new_y = rect_in.height // 5
-    shovel = pygame.transform.scale(shovel, (new_x, new_y))
-    screen.blit(shovel, [width - new_x, height - new_y])
+    # shovel = pygame.image.load('textures/shovel.png')
+    # rect_in = shovel.get_rect()
+    # new_x = rect_in.width // 5
+    # new_y = rect_in.height // 5
+    # shovel = pygame.transform.scale(shovel, (new_x, new_y))
+    # screen.blit(shovel, [width - new_x, height - new_y])
 
 
 def set_sun_counter(screen, count):
@@ -85,10 +85,16 @@ def create_zombie_column(count, zombie_type, board, cell_size, width, sheet, she
 def check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_group, top_y, top_x, cell_size, board):
     coords = []
     a = []
+    zmb = []
 
+    for i in zombies_group:
+        zy = (i.rect.y - top_y) // cell_size
+        if zy not in a:
+            a.append(zy)
+            zmb.append(i)
     for i in all_player_sprites:
         coords.append([(i.rect.x - top_x) // cell_size, (i.rect.y - top_y) // cell_size])
-    for i in zombies_group:
+    for i in zmb:
         zy = (i.rect.y - top_y) // cell_size
         zx = (i.rect.x - top_x) // cell_size
         for x, y in coords:
@@ -96,9 +102,8 @@ def check_if_zombie_and_plant(screen, zombies_group, all_player_sprites, balls_g
                 if i.count_return():
                     shooter_balls(screen, board, x, y, top_y, top_x, cell_size, i, balls_group)
                     for b in balls_group:
-                        if zy not in a and (b.a - top_x) // cell_size == zx:
+                        if (b.x - top_x) // cell_size == zx:
                             i.killing()
-        a.append(zy)
 
 
 def create_plant(board, pos, tops, cell_size, all_player_sprites):
@@ -153,6 +158,9 @@ def load_zombie_pic(z_type):
         print(f"WRONG PARAM {z_type}: at func load_zombie_pic")
         return None
     return zombie
+
+#def shovel_activated(self, board):
+
 
 
 def addUser(user):

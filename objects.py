@@ -6,6 +6,8 @@ TILE_IMG = {
     'grass2': pygame.image.load('textures/grass2.png')
 }
 
+ball_image = pygame.image.load('textures/ball.png')
+ball_image = pygame.transform.scale(ball_image, (610 // 18, 527 // 18))
 
 # Игровое поле
 class Board:
@@ -114,10 +116,12 @@ class ZombieDefault(pygame.sprite.Sprite):
 
     def killing(self):
         if self.counter % 15 == 0:
-            if self.hp > self.damage:
-                self.hp -= self.damage
+            if self.hp > 12:
+                self.hp -= 12
+
             else:
                 self.kill()
+
 
     def update(self):
         if self.rect.x <= self.border:
@@ -156,22 +160,20 @@ class Ball(pygame.sprite.Sprite):
     def __init__(self, screen, board, row, col,  top, left, sz,  zombie, *group):
         super().__init__(*group)
         self.sz = sz
-        self.a, self.b = row, col
+        self.x, self.y = row, col
         self.top, self.left = top, left
         self.board = board
         self.screen = screen
         self.zombie = zombie
 
-        self.image = pygame.image.load('textures/ball.png')
-        self.image = pygame.transform.scale(self.image, (610 // 18, 527 // 18))
 
     def check(self):
-        if self.a - 5 <= self.zombie.rect.x <= self.a + 5:
+        if self.x - 15 <= self.zombie.rect.x <= self.x + 15:
             self.kill()
 
     def update(self):
-        self.screen.blit(self.image, [self.a, self.b])
-        self.a += 5
+        self.screen.blit(ball_image, [self.x, self.y])
+        self.x += 5
         self.check()
 
 
@@ -198,6 +200,8 @@ class Player(pygame.sprite.Sprite):
                 frame_location = (self.rect.w * i, self.rect.h * j)
                 self.frames.append(sheet.subsurface(pygame.Rect(
                     frame_location, self.rect.size)))
+
+
 
     def update(self):
         if not self.board.check_if_occupied((self.rect.x, self.rect.y + self.image.get_height() // 2)):
