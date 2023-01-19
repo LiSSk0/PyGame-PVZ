@@ -101,8 +101,7 @@ def menu_screen(fps, username):
     screen.blit(zombie_pic, (width - zombie_pic.get_width() + 50, height - zombie_pic.get_height()))
     tree_pic = pygame.image.load('textures/creepy_tree.png')
     tree_pic = pygame.transform.scale(tree_pic, (300, 550))
-    screen.blit(tree_pic, (25, height // 6))
-
+    screen.blit(tree_pic, (25, height // 4))
 
     button = pygame.image.load('textures/button.png')
     button_size = (275, 90)
@@ -139,10 +138,12 @@ def menu_screen(fps, username):
     nickname = str(username)
     if len(nickname) > 9:
         nickname = nickname[:8] + "..."
-    text_username = font.render(str("Username: '" + nickname + "'"), True, (150, 0, 200))
+    text_username = font.render("Username: '" + nickname + "'", True, (150, 0, 200))
     screen.blit(text_username, (10, 10))
-    text_username = font.render(str("Completed levels: " + str(level - 1)), True, (150, 0, 200))
-    screen.blit(text_username, (10, 50))
+    text_levels = font.render("Completed levels: " + str(level - 1), True, (150, 0, 200))
+    screen.blit(text_levels, (10, 50))
+    text_info = font.render("ESC - Back to login menu", True, (150, 0, 200))
+    screen.blit(text_info, (750, 10))
 
     clock = pygame.time.Clock()
 
@@ -151,6 +152,9 @@ def menu_screen(fps, username):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return 0
             if event.type == pygame.MOUSEBUTTONUP:
                 x, y = event.pos
                 if level >= 1 and \
@@ -258,7 +262,8 @@ def level_screen(fps, level, username, cur_level):
             decorations(screen, width, height)
 
             types = ['default', 'woman', 'grass']
-            if counter % 500 == 0:
+            counter_speed = 200
+            if counter % counter_speed == 0:
                 if (zombie_count['default'] + zombie_count['woman'] + zombie_count['grass']) > 0:
                     zombie_type = choice(types)
                     while zombie_count[zombie_type] == 0:
@@ -266,7 +271,7 @@ def level_screen(fps, level, username, cur_level):
                     create_zombie_column(1, zombie_type, board, cell_size, width,
                                          load_zombie_pic(zombie_type), (6, 1), zombies_group)
                     zombie_count[zombie_type] -= 1
-                counter //= 500
+                counter //= counter_speed
             counter += 1
 
             if pygame.sprite.spritecollideany(border_sprite, zombies_group):
